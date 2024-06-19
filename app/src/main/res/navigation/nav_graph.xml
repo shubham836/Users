@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/usersFragment"
-        android:name="com.shubh.users.ui.fragments.UsersFragment"
+        android:name="com.shubh.users.ui.fragment.UsersFragment"
         android:label="fragment_users"
         tools:layout="@layout/fragment_users" >
         <action
@@ -16,16 +16,24 @@
     </fragment>
     <fragment
         android:id="@+id/favoriteUsersFragment"
-        android:name="com.shubh.users.ui.fragments.FavoriteUsersFragment"
+        android:name="com.shubh.users.ui.fragment.FavoriteUsersFragment"
         android:label="fragment_favorite_users"
         tools:layout="@layout/fragment_favorite_users" >
         <action
             android:id="@+id/action_favoriteUsersFragment_to_userDetailFragment"
-            app:destination="@id/userDetailFragment" />
+            app:destination="@id/userDetailFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/userDetailFragment"
-        android:name="com.shubh.users.ui.fragments.UserDetailFragment"
+        android:name="com.shubh.users.ui.fragment.UserDetailFragment"
         android:label="fragment_user_detail"
-        tools:layout="@layout/fragment_user_detail" />
+        tools:layout="@layout/fragment_user_detail" >
+        <argument
+            android:name="user"
+            app:argType="com.shubh.users.model.User" />
+    </fragment>
 </navigation>

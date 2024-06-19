@@ -1,20 +1,30 @@
 package com.shubh.users.ui
 
+import android.app.Application
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.elevation.SurfaceColors
+import com.shubh.users.App
 import com.shubh.users.R
+import com.shubh.users.UserRepository
 import com.shubh.users.databinding.ActivityMainBinding
+import com.shubh.users.ui.viewmodel.UserViewModel
+import com.shubh.users.ui.viewmodel.UserViewModelProviderFactory
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var userViewModel:UserViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,5 +48,23 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
 
         binding.bottomNav.setupWithNavController(navController)
+
+        val userDB = (application as App).userDB
+        val userViewModelFactory = UserViewModelProviderFactory(UserRepository(userDB))
+        userViewModel = ViewModelProvider(this,userViewModelFactory).get(UserViewModel::class.java)
+
+        navController.addOnDestinationChangedListener(object : NavController.OnDestinationChangedListener{
+            override fun onDestinationChanged(
+                controller: NavController,
+                destination: NavDestination,
+                arguments: Bundle?
+            ) {
+                if (destination.id == R.id.userDetailFragment)
+                    binding.bottomNav.visibility = View.GONE
+                else
+                    binding.bottomNav.visibility = View.VISIBLE
+            }
+
+        })
     }
 }

@@ -12,12 +12,15 @@ interface UsersDao {
     @Query("SELECT * FROM UserEntity")
     suspend fun getFavoriteUsers(): List<UserEntity>
 
+    @Query("SELECT * FROM UserEntity where id==:userId")
+    suspend fun getUserById(userId:Int): UserEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addFavoriteUser(user: UserEntity)
+    suspend fun addUser(user: UserEntity)
 
     @Delete
-    suspend fun deleteFavoriteUser(user: UserEntity)
+    suspend fun removeFromFavorites(user: UserEntity)
 
     @Update
-    suspend fun updateUserAddress(user: UserEntity)
+    suspend fun updateUser(user: UserEntity)
 }
