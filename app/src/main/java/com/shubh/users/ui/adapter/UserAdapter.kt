@@ -7,8 +7,8 @@ import com.shubh.users.databinding.ItemUserBinding
 import com.shubh.users.model.User
 
 class UserAdapter(
-    val userList: List<User>,
-    val onClick: (position: Int) -> Unit,
+    var userList: List<User>,
+    var onClick: (position: Int) -> Unit,
     val onLongPress: ((position: Int) -> Unit)? = null
 ) : RecyclerView.Adapter<UserAdapter.ViewHolder>() {
     class ViewHolder(val binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root) {
