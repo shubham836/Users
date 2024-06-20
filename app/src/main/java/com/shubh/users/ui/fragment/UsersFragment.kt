@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.shubh.users.R
+import com.shubh.users.UserResponse
 import com.shubh.users.databinding.FragmentUsersBinding
 import com.shubh.users.model.User
 import com.shubh.users.ui.adapter.UserAdapter
@@ -50,29 +51,33 @@ class UsersFragment : Fragment() {
 
         binding.userRecyclerView.layoutManager = LinearLayoutManager(context)
         userViewModel.userList.observe(viewLifecycleOwner, Observer {
-            usersList.clear()
-            usersList = it.toMutableList()
-            binding.loadingTextView.visibility = View.GONE
-            binding.userRecyclerView.visibility = View.VISIBLE
-            userAdapter = UserAdapter(it, ({ position, sharedElement ->
-                val action =
-                    UsersFragmentDirections.actionUsersFragmentToUserDetailFragment(it[position])
-                val extras = FragmentNavigatorExtras(sharedElement to sharedElement.transitionName)
-                findNavController().navigate(action, extras)
-            }))
-            binding.userRecyclerView.adapter = userAdapter
-        })
+            when(it){
+                is UserResponse.Error -> {
+                    usersList.clear()
+                    userAdapter.userList = usersList
+                    userAdapter.notifyDataSetChanged()
+                    binding.loadingTextView.visibility = View.GONE
 
-        userViewModel.errorMessage.observe(viewLifecycleOwner, Observer {
-            usersList.clear()
-            userAdapter.userList = usersList
-            userAdapter.notifyDataSetChanged()
-            binding.loadingTextView.visibility = View.GONE
-
-            Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).setAction("Retry") {
-                userViewModel.getUsers()
-                binding.loadingTextView.visibility = View.VISIBLE
-            }.show()
+                    Snackbar.make(binding.root, it.message.toString(), Snackbar.LENGTH_LONG).setAction("Retry") {
+                        userViewModel.getUsers()
+                        binding.loadingTextView.visibility = View.VISIBLE
+                    }.show()
+                }
+                is UserResponse.Loading -> binding.loadingTextView.visibility = View.VISIBLE
+                is UserResponse.Success -> {
+                    usersList.clear()
+                    usersList = it.data!!.toMutableList()
+                    binding.loadingTextView.visibility = View.GONE
+                    binding.userRecyclerView.visibility = View.VISIBLE
+                    userAdapter = UserAdapter(usersList, ({ position, sharedElement ->
+                        val action =
+                            UsersFragmentDirections.actionUsersFragmentToUserDetailFragment(usersList[position])
+                        val extras = FragmentNavigatorExtras(sharedElement to sharedElement.transitionName)
+                        findNavController().navigate(action, extras)
+                    }))
+                    binding.userRecyclerView.adapter = userAdapter
+                }
+            }
         })
 
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
