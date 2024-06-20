@@ -1,6 +1,7 @@
 package com.shubh.users.ui.fragment
 
 import android.os.Bundle
+import android.transition.TransitionInflater
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.shubh.users.R
 import com.shubh.users.databinding.FragmentUserDetailBinding
 import com.shubh.users.db.UserEntity
 import com.shubh.users.model.Address
@@ -24,6 +26,10 @@ class UserDetailFragment : Fragment() {
     private var currentUser: UserEntity? = null
     private val args: UserDetailFragmentArgs by navArgs()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.fade)
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -47,6 +53,8 @@ class UserDetailFragment : Fragment() {
             if (userEntity == null)
                 binding.addFavoriteButton.visibility = View.VISIBLE
             else {
+                if (user.id!=userEntity.id)
+                    return@Observer
                 currentUser = userEntity
                 if (!userEntity.isFavorite) {
                     binding.addFavoriteButton.visibility = View.VISIBLE
@@ -131,9 +139,12 @@ class UserDetailFragment : Fragment() {
                         false
                     )
                 )
+                binding.addFavoriteButton.visibility = View.GONE
                 return@setOnClickListener
             }
             userViewModel.updateUser(currentUser!!.copy(isFavorite = true))
+            binding.addFavoriteButton.visibility = View.GONE
+
         }
 
     }

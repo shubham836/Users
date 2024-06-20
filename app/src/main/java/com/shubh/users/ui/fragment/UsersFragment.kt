@@ -10,8 +10,10 @@ import android.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.shubh.users.R
 import com.shubh.users.databinding.FragmentUsersBinding
 import com.shubh.users.model.User
@@ -52,12 +54,25 @@ class UsersFragment : Fragment() {
             usersList = it.toMutableList()
             binding.loadingTextView.visibility = View.GONE
             binding.userRecyclerView.visibility = View.VISIBLE
-            userAdapter = UserAdapter(it, ({ position ->
+            userAdapter = UserAdapter(it, ({ position, sharedElement ->
                 val action =
                     UsersFragmentDirections.actionUsersFragmentToUserDetailFragment(it[position])
-                findNavController().navigate(action)
+                val extras = FragmentNavigatorExtras(sharedElement to sharedElement.transitionName)
+                findNavController().navigate(action, extras)
             }))
             binding.userRecyclerView.adapter = userAdapter
+        })
+
+        userViewModel.errorMessage.observe(viewLifecycleOwner, Observer {
+            usersList.clear()
+            userAdapter.userList = usersList
+            userAdapter.notifyDataSetChanged()
+            binding.loadingTextView.visibility = View.GONE
+
+            Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).setAction("Retry") {
+                userViewModel.getUsers()
+                binding.loadingTextView.visibility = View.VISIBLE
+            }.show()
         })
 
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
@@ -66,12 +81,14 @@ class UsersFragment : Fragment() {
                 if (query != null) {
                     val filteredList = usersList.filter { it.name.contains(query.trim(), true) }
                     userAdapter.userList = filteredList
-                    userAdapter.onClick = ({ position ->
+                    userAdapter.onClick = ({ position, sharedElement ->
                         val action =
                             UsersFragmentDirections.actionUsersFragmentToUserDetailFragment(
                                 filteredList[position]
                             )
-                        findNavController().navigate(action)
+                        val extras =
+                            FragmentNavigatorExtras(sharedElement to sharedElement.transitionName)
+                        findNavController().navigate(action, extras)
                     })
                     userAdapter.notifyDataSetChanged()
                 } else {

@@ -19,6 +19,8 @@ class UserViewModel(val userRepository: UserRepository) : ViewModel() {
     val favoriteUserList: LiveData<List<UserEntity>> get() = _favoriteUserList
     private var _userEntity: MutableLiveData<UserEntity?> = MutableLiveData()
     val userEntity: LiveData<UserEntity?> get() = _userEntity
+    private var _errorMessage: MutableLiveData<String> = MutableLiveData()
+    val errorMessage: LiveData<String> get() = _errorMessage
 
     fun getUsers() {
         viewModelScope.launch {
@@ -26,9 +28,8 @@ class UserViewModel(val userRepository: UserRepository) : ViewModel() {
                 val response = userRepository.getUsers()
                 _userList.postValue(response.body())
             } catch (e: Exception) {
-                Log.e(TAG, "getUsers: ${e.stackTraceToString()}")
+                _errorMessage.postValue(e.message)
             }
-
         }
     }
 
@@ -58,7 +59,6 @@ class UserViewModel(val userRepository: UserRepository) : ViewModel() {
     fun updateUser(user: UserEntity) {
         viewModelScope.launch {
             try {
-
                 userRepository.updateUser(user)
             }catch (e:Exception){
                 Log.e(TAG, "updateUser: ${e.stackTraceToString()}")

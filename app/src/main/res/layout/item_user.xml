@@ -8,6 +8,7 @@
     app:strokeWidth="1.5dp"
     android:id="@+id/userCardView"
     app:strokeColor="@color/blue"
+    android:transitionName="cardTransition"
     app:cardCornerRadius="8dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout

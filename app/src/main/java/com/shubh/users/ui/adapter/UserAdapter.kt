@@ -1,6 +1,7 @@
 package com.shubh.users.ui.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.shubh.users.databinding.ItemUserBinding
@@ -8,7 +9,7 @@ import com.shubh.users.model.User
 
 class UserAdapter(
     var userList: List<User>,
-    var onClick: (position: Int) -> Unit,
+    var onClick: (position: Int, view: View) -> Unit,
     val onLongPress: ((position: Int) -> Unit)? = null
 ) : RecyclerView.Adapter<UserAdapter.ViewHolder>() {
     class ViewHolder(val binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -30,9 +31,10 @@ class UserAdapter(
         holder.binding.emailTextView.text = currentUser.email
         holder.binding.phoneTextView.text = currentUser.phone
         holder.binding.userCardView.setOnClickListener {
-            onClick(position)
+            onClick(position, holder.binding.userCardView)
         }
 
+        // onLongPress is nullable as UsersFragment wont have this functionality.
         holder.binding.userCardView.setOnLongClickListener {
             if (onLongPress != null) {
                 onLongPress.invoke(position)

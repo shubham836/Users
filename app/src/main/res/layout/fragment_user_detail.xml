@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:layout_margin="8dp"
     app:strokeColor="@color/blue"
+    android:transitionName="cardTransition"
     app:strokeWidth="1.5dp"
     tools:context=".ui.fragment.UserDetailFragment">
 

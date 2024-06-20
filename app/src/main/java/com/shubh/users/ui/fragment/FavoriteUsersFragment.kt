@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -53,12 +54,13 @@ class FavoriteUsersFragment : Fragment() {
                     )
                 )
             }
-            userAdapter = UserAdapter(favoriteUsersList, { position ->
+            userAdapter = UserAdapter(favoriteUsersList, { position,sharedElement ->
                 val action =
                     FavoriteUsersFragmentDirections.actionFavoriteUsersFragmentToUserDetailFragment(
                         favoriteUsersList[position]
                     )
-                findNavController().navigate(action)
+                val extras = FragmentNavigatorExtras(sharedElement to sharedElement.transitionName)
+                findNavController().navigate(action,extras)
             }) { position ->
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Remove from Favorites")
@@ -67,7 +69,6 @@ class FavoriteUsersFragment : Fragment() {
                         dialog.dismiss()
                     }
                     .setPositiveButton("Remove") { dialog, which ->
-
                         userViewModel.removeUser(userEntityList[position])
                         favoriteUsersList.removeAt(position)
                         userAdapter.notifyItemRemoved(position)
